@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: victim-service
+  labels:
+    app: victim
+spec:
+  replicas: 2 # We want 2 instances running for high availability
+  selector:
+    matchLabels:
+      app: victim
+  template:
+    metadata:
+      labels:
+        app: victim
+    spec:
+      containers:
+      - name: victim-api
+        image: cacop-victim:v1
+        imagePullPolicy: Never # Crucial for local dev: tells K8s to use the local Mac image, not DockerHub
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            cpu: "100m"    # 1/10th of a CPU core reserved
+            memory: "128Mi"
+          limits:
+            cpu: "500m"    # Max half a core
+            memory: "256Mi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: victim-service
+spec:
+  type: ClusterIP # Internal routing only
+  selector:
+    app: victim
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
