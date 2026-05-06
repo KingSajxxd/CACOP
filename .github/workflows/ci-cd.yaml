@@ -1,0 +1,35 @@
+name: CACOP Local Pipeline
+
+# Trigger the pipeline every time you push to the main branch
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    # THIS IS THE MAGIC WORD. It tells GitHub to use your Mac, not their cloud.
+    runs-on: self-hosted 
+
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🐳 Build Docker Image (Inside Minikube)
+        run: |
+          # Point Docker to Minikube's internal daemon
+          eval $(minikube docker-env)
+          # Build the image using the latest code
+          docker build -t cacop-victim:latest .
+
+      - name: ☸️ Deploy to Minikube
+        run: |
+          # Apply the manifests
+          kubectl apply -f k8s/deployment.yaml
+          
+          # Force Kubernetes to restart the pods to pick up the new 'latest' image
+          kubectl rollout restart deployment victim-service
+          
+      - name: ✅ Verify Deployment
+        run: |
+          kubectl get pods
