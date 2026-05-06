@@ -14,7 +14,7 @@ def cpu_intensive_task(duration_seconds: int):
 @app.get("/health")
 def health_check():
     """Standard endpoint for K8s liveness probes."""
-    return {"status": "healthy"}
+    return {"status": "healthy", "version": "2"}
 
 @app.get("/api/normal")
 def normal_request():
