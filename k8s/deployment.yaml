@@ -5,7 +5,7 @@ metadata:
   labels:
     app: victim
 spec:
-  replicas: 2 # We want 2 instances running for high availability
+  replicas: 1 # We want 1 instance running
   selector:
     matchLabels:
       app: victim
@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: victim-api
-        image: cacop-victim:v1
+        image: cacop-victim:latest # This should match the tag we build in the GitHub Action
         imagePullPolicy: Never # Crucial for local dev: tells K8s to use the local Mac image, not DockerHub
         ports:
         - containerPort: 8000
