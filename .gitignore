@@ -12,6 +12,12 @@ env/
 
 # macOS
 .DS_Store
+._*
+
+# Installer binaries (downloaded during setup, installed to /usr/local/bin)
+kubectl
+minikube-linux-amd64
+minikube
 
 # IDEs
 .vscode/
